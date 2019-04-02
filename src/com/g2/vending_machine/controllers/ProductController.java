@@ -44,7 +44,7 @@ public class ProductController {
 			if(amount == 0) break;
 			
 			if(addMoreProducts) {
-				product = this.handleSelection();
+				product = this.handleSelection(amount);
 				if(product != null) products.add(product);
 			}
 			
@@ -52,18 +52,18 @@ public class ProductController {
 			
 			float change = amount - product.getProductPrice();
 			if(change > 0) {
-				addMoreProducts = this.keepProducts();
+				addMoreProducts = this.keepProducts(change);
 				addMoreMoney = false;
 				keepBuyig = addMoreProducts;
+				amount = change;
 			} else if(change < 0) {
-				addMoreProducts = false;
+				addMoreProducts = true;
 				addMoreMoney = true;
-				keepBuyig = addMoreMoney;
 			} else {
 				keepBuyig = false;
 			}
 			
-			String productList = products.stream().map(Product::getProductName).collect(Collectors.joining(","));
+			String productList = products.stream().map(Product::getProductName).collect(Collectors.joining(", "));
 			message = String.format("Change: %.2f and Product(s): %s", change, productList);
 			
 		} while(keepBuyig);
@@ -71,13 +71,13 @@ public class ProductController {
 		return message;
 	}
 	
-	private Product handleSelection() {
+	private Product handleSelection(float amount) {
 		this.showProductList();
 		
 		Scanner scan = new Scanner(System.in);
 		String code = null;
 		do {
-			System.out.print("Introduce the code of the product: ");
+			System.out.printf("\nYou have %.2f. Introduce the code of the product: ", amount);
 			code = scan.nextLine();
 		
 			if(!this.productList.containsKey(code)) {
@@ -90,8 +90,8 @@ public class ProductController {
 		return this.productList.get(code);
 	}
 	
-	private boolean keepProducts() {
-		System.out.print("Would you like to purchase anything else (Y/N)?: ");
+	private boolean keepProducts(float change) {
+		System.out.printf("Your change is %.2f. Would you like to purchase anything else (Y/N)?: ", change);
 		Scanner scan = new Scanner(System.in);
 		String response = scan.nextLine();
 		
@@ -102,7 +102,7 @@ public class ProductController {
 		float accum = amount;
 		int i;
 
-		this.denominationMenu();
+		this.denominationMenu(amount);
 		Scanner scan = new Scanner(System.in);
 		do {
 			i = scan.nextInt();
@@ -113,7 +113,7 @@ public class ProductController {
 			} else if(i == 8) {
 				// Do nothing yet
 			} else {
-				System.out.println("Please, introduce a correct denomination (press 8 to SELECT PRODUCT): ");
+				System.out.print("Please, introduce a correct denomination (press 8 to SELECT PRODUCT): ");
 			}
 			
 		} while(i != 8);
@@ -121,21 +121,23 @@ public class ProductController {
 		return accum;
 	}
 	
-	private void denominationMenu() {
+	private void denominationMenu(float amount) {
 		ScreenUtils.clearScreen();
-		System.out.println("1. 1 cent");
+		System.out.println("\n1. 1 cent");
 		System.out.println("2. 5 cent");
 		System.out.println("3. 10 cent");
 		System.out.println("4. 25 cent");
 		System.out.println("5. 50 cent");
 		System.out.println("6. 1 dollar");
 		System.out.println("7. 2 dollar");
-		System.out.println();
+		String message = amount > 0f? "\nYou have $%.2f\n" : "\n";
+		System.out.printf(message, amount);
 		System.out.print("Based on above denomination list, introduce money (press 8 to SELECT PRODUCT): ");
 	}
 
 	private void showProductList() {
 		ScreenUtils.clearScreen();
+		System.out.println("\n");
 		productList.entrySet()
 					.stream()
 					.forEach(e -> 
@@ -143,5 +145,6 @@ public class ProductController {
 											e.getKey() + " - " +
 											e.getValue().getProductName() + " $" +
 											e.getValue().getProductPrice()));
+		System.out.println("\n");
 	}
 }

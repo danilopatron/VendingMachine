@@ -54,7 +54,7 @@ public class MainApplication {
 	}
 
 	private static String fileUploaded() {
-		System.out.print("Insert the path + file name: ");
+		System.out.print("\n\nInsert the path + file name: ");
 		Scanner scan = new Scanner(System.in);
 		return scan.nextLine();
 	}
