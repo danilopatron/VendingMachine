@@ -1,7 +1,10 @@
 package com.g2.vending_machine.controllers;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 import com.g2.vending_machine.models.Product;
 import com.g2.vending_machine.utils.ScreenUtils;
@@ -25,24 +28,45 @@ public class ProductController {
 	}
 	
 	public String handleProductTransaction() {
-		boolean buy = true;
+		boolean keepBuyig = false;
+		
+		//States
+		boolean addMoreProducts = true;
+		boolean addMoreMoney = true;
+		
+		List<Product> products = new ArrayList<Product>();
+		Product product = null;
 		String message = "";
+		float amount = 0f;
 		
 		do {
-			
-			float amount = this.handlePay(0f);
+			if(addMoreMoney) amount = this.handlePay(amount);
 			if(amount == 0) break;
 			
-			Product product = this.handleSelection();
-			if(product == null) break;
+			if(addMoreProducts) {
+				product = this.handleSelection();
+				if(product != null) products.add(product);
+			}
+			
+			if(products.size() == 0) break;
 			
 			float change = amount - product.getProductPrice();
-			if(change < 0) break;
+			if(change > 0) {
+				addMoreProducts = this.keepProducts();
+				addMoreMoney = false;
+				keepBuyig = addMoreProducts;
+			} else if(change < 0) {
+				addMoreProducts = false;
+				addMoreMoney = true;
+				keepBuyig = addMoreMoney;
+			} else {
+				keepBuyig = false;
+			}
 			
-			message = String.format("Change: %.2f and Product: %s", change, product.getProductName());
-			buy = false;
+			String productList = products.stream().map(Product::getProductName).collect(Collectors.joining(","));
+			message = String.format("Change: %.2f and Product(s): %s", change, productList);
 			
-		} while(buy);
+		} while(keepBuyig);
 		
 		return message;
 	}
@@ -64,6 +88,14 @@ public class ProductController {
 		} while(code == null);
 		
 		return this.productList.get(code);
+	}
+	
+	private boolean keepProducts() {
+		System.out.print("Would you like to purchase anything else (Y/N)?: ");
+		Scanner scan = new Scanner(System.in);
+		String response = scan.nextLine();
+		
+		return response.trim().toUpperCase().equals("Y");
 	}
 	
 	private float handlePay(float amount) {
