@@ -10,21 +10,12 @@ import com.g2.vending_machine.models.Product;
 import com.g2.vending_machine.utils.ScreenUtils;
 
 public class ProductController {
-	private static ProductController productController = null;
 	private Map<String, Product> productList = null;
 	private final float[] denomination = {0.01f, 0.05f, 0.1f, 0.25f, 0.5f, 1.0f, 2.0f};
 	
-	private ProductController(Map<String, Product> productList) {
+	public ProductController(Map<String, Product> productList) {
 		// TODO Auto-generated constructor stub
 		this.productList = productList;
-	}
-	
-	public static ProductController getInstance(Map<String, Product> productList) {
-		if(productController == null) {
-			productController = new ProductController(productList);
-		}
-		
-		return productController;
 	}
 	
 	public String handleProductTransaction() {

@@ -31,7 +31,7 @@ public class MainApplication {
 					break;
 				case 2:
 					ScreenUtils.clearScreen();
-					pc = ProductController.getInstance(productList);
+					pc = new ProductController(productList);
 					message = pc.handleProductTransaction();
 					break;
 				default:
