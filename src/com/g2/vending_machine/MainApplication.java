@@ -31,7 +31,7 @@ public class MainApplication {
 					break;
 				case 2:
 					ScreenUtils.clearScreen();
-					pc = ProductController.getInstance(productList);
+					pc = new ProductController(productList);
 					message = pc.handleProductTransaction();
 					break;
 				default:
@@ -54,7 +54,7 @@ public class MainApplication {
 	}
 
 	private static String fileUploaded() {
-		System.out.print("Insert the path + file name: ");
+		System.out.print("\n\nInsert the path + file name: ");
 		Scanner scan = new Scanner(System.in);
 		return scan.nextLine();
 	}
